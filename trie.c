@@ -35,14 +35,14 @@
 #include "trie.h"
 
 const int trieVal = TRIE_LIMIT;
-const int trieMask = 0xff >> (BYTE_SIZE - TRIE_SPAN);
-const int trieOff = BYTE_SIZE / TRIE_SPAN;
 const int trieDiff = BYTE_SIZE - TRIE_SPAN;
+const int trieMask = 0xff >> trieDiff;
+const int trieOff = BYTE_SIZE / TRIE_SPAN;
 
 int trieStrlen (nByte_t* str) {
   unsigned int len, nlen;
   len = (unsigned int)strlen((const char *)str);
-  nlen = (len > KEY_MAX ? KEY_MAX : len);
+  nlen = (len > TRIE_KEY_MAX ? TRIE_KEY_MAX : len);
   return (int)nlen;
 }
 

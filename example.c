@@ -9,7 +9,7 @@ void teststr(char * str)
 {
   int i = 0;
   char alphabet[] = "abcdefghijklmnopqrstuvwxyz";
-  for ( ; i < 9; i++) {
+  for ( ; i < 31; i++) {
     str[i] = alphabet[rand() % 26];
   }
   str[i] = 0;
@@ -20,15 +20,15 @@ int main (void)
   Trie* trie = trieInit();
   int i;
   double end, start;
-  char str[10];
+  char str[32];
   srand(time(NULL));
   start = (float)clock()/CLOCKS_PER_SEC;
-  for( i=0; i<100000; ++i ){
+  for( i=0; i<500000; ++i ){
     teststr(str);
     trieAdd(trie, (unsigned char*)str, "val");
   }
   trieAdd(trie, (unsigned char*)"hello", "world");
-  for( i=0; i<100000; ++i ){
+  for( i=0; i<500000; ++i ){
     teststr(str);
     trieAdd(trie, (unsigned char*)str, "val");
   }

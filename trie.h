@@ -31,16 +31,18 @@
 #ifndef _TRIE_H
 #define _TRIE_H
 
-#define KEY_MAX 32
-
 typedef unsigned long int nWord_t;
 typedef unsigned char nByte_t;
 
 /* to change trie span, both variables below must be changed */
-#define TRIE_SPAN  3 /* trie span */
-#define TRIE_LIMIT 8 /* 2 ^ span */
+#define TRIE_SPAN  5 /* trie span */
+#define TRIE_LIMIT 32 /* 2 ^ span */
 
-#define TRIE_POOL  256
+/* this doesn't need to be changed, but doing so accordingly 
+(with the above variables) can greatly impact performance */
+#define TRIE_KEY_MAX 9
+
+#define TRIE_POOL  64
 #define BYTE_SIZE  8
 
 typedef union trieElem TrieElem;
