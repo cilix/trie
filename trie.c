@@ -39,6 +39,12 @@ const int trieDiff = BYTE_SIZE - TRIE_SPAN;
 const int trieMask = 0xff >> trieDiff;
 const int trieOff = BYTE_SIZE / TRIE_SPAN;
 
+#define trieStep() do { \
+  m = i % trieOff, n = i / trieOff; \
+  s = (trieDiff - (m * TRIE_SPAN)); \
+  c = (key[n] & (trieMask << s)) >> s; \
+} while (0)
+
 int trieStrlen (nByte_t* str) {
   unsigned int len, nlen;
   len = (unsigned int)strlen((const char *)str);
@@ -78,9 +84,7 @@ TrieElem* trieFind (Trie* t, nByte_t* key, int alloc) {
   unsigned i, l, c, m, n, s;
   l = trieStrlen(key) * trieOff;
   for (i = 0; i < l; i++) {
-    m = i % trieOff, n = i / trieOff;
-    s = (trieDiff - (m * TRIE_SPAN));
-    c = (key[n] & (trieMask << s)) >> s;
+    trieStep();
     if (!t->sub[c]) {
       if (!alloc) { return NULL; }
       t->sub[c] = (nWord_t)trieElemInit();
@@ -88,6 +92,44 @@ TrieElem* trieFind (Trie* t, nByte_t* key, int alloc) {
     t = (TrieElem *)t->sub[c];
   }
   return t;
+}
+
+int trieDelete (Trie* t, nByte_t* key, void (*destroy)(nWord_t)) {
+  unsigned i, l, c, m, n, s, u;
+  int z;
+  nWord_t* stack;
+  TrieElem* del;
+  z = 0, l = trieStrlen(key) * trieOff;
+  stack = trieMalloc(l);
+  for (i = 0; i < l; i++) {
+    trieStep();
+    if (!t->sub[c]) { return 0; }
+    stack[z++] = (nWord_t)t;
+    t = (TrieElem *)t->sub[c];
+  }
+  stack[z] = (nWord_t)t;
+  u = 0;
+  del = (TrieElem *)stack[z--];
+  if (del->sub[trieVal]) {
+    destroy(del->sub[trieVal]);
+  }
+  for (i = 0; i < trieVal; i++) {
+    if (del->sub[i]) { u += 1; }
+  }
+  if (!u) { free((void *)del); }
+  while (z >= 0) {
+    u = 0;
+    del = (TrieElem *)stack[z--];
+    for (i = 0; i <= trieVal; i++) {
+      if (del->sub[i] == stack[z+1]) {
+        del->sub[i] = 0;
+      } else if (del->sub[i]) { 
+        u += 1;
+      }
+    }
+    if (!u) { free((void *)del); }
+  }
+  return 1;
 }
 
 int trieAdd (Trie* t, nByte_t* key, void* val) {

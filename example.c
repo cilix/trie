@@ -15,6 +15,11 @@ void teststr(char * str)
   str[i] = 0;
 }
 
+void destroy (nWord_t val) {
+  /* custom destroy function here for node values */
+  puts((const char *)val);
+}
+
 int main (void)
 {
   Trie* trie = trieInit();
@@ -37,5 +42,6 @@ int main (void)
   printf("Finshed in %f. Press enter.", end-start);
   getchar();
   puts((const char*)trieGet(trie, (unsigned char*)"hello"));
+  trieDelete(trie, (unsigned char *)"hello", &destroy);
   return 0;
 }

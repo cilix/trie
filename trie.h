@@ -57,9 +57,10 @@ union trieElem {
 int trieStrlen (nByte_t *);
 void* trieMalloc (nWord_t);
 Trie* trieInit (void);
-int trieAdd (Trie* t, nByte_t *, void *);
-void* trieGet (Trie* t, nByte_t* key);
+int trieAdd (Trie *, nByte_t *, void *);
+void* trieGet (Trie *, nByte_t* key);
 Trie* trieElemInit (void);
 TrieElem* trieFind (Trie *, nByte_t *, int);
+int trieDelete (Trie *, nByte_t *, void (*destroy)(nWord_t));
 
 #endif
