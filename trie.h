@@ -31,6 +31,8 @@
 #ifndef _TRIE_H
 #define _TRIE_H
 
+#define TRIE_USE_CHAINING
+
 typedef unsigned long int nWord_t;
 typedef unsigned char nByte_t;
 
@@ -40,18 +42,23 @@ typedef unsigned char nByte_t;
 
 /* this doesn't need to be changed, but doing so accordingly 
 (with the above variables) can greatly impact performance */
-#define TRIE_KEY_MAX 9
+#define TRIE_KEY_MAX 32
 
 #define TRIE_POOL  64
 #define BYTE_SIZE  8
 
-typedef union trieElem TrieElem;
+typedef struct trieElem TrieElem;
 typedef TrieElem Trie;
 
 size_t bytes;
 
-union trieElem {
+struct trieElem {
+#ifndef TRIE_USE_CHAINING
   nWord_t sub[TRIE_LIMIT + 1];
+#else
+  nByte_t c;
+  nWord_t sub[3];
+#endif
 };
 
 int trieStrlen (nByte_t *);

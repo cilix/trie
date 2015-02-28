@@ -17,7 +17,6 @@ void teststr(char * str)
 
 void destroy (nWord_t val) {
   /* custom destroy function here for node values */
-  puts((const char *)val);
 }
 
 int main (void)
@@ -33,6 +32,8 @@ int main (void)
     trieAdd(trie, (unsigned char*)str, "val");
   }
   trieAdd(trie, (unsigned char*)"hello", "world");
+  trieAdd(trie, (unsigned char*)"hell", "is a wonderful place");
+  trieAdd(trie, (unsigned char*)"he'll", "never marry you");
   for( i=0; i<500000; ++i ){
     teststr(str);
     trieAdd(trie, (unsigned char*)str, "val");
@@ -43,5 +44,10 @@ int main (void)
   getchar();
   puts((const char*)trieGet(trie, (unsigned char*)"hello"));
   trieDelete(trie, (unsigned char *)"hello", &destroy);
+  puts((const char*)trieGet(trie, (unsigned char*)"hell"));
+  puts((const char*)trieGet(trie, (unsigned char*)"he'll"));
+  trieDelete(trie, (unsigned char *)"hell", &destroy);
+  puts((const char*)trieGet(trie, (unsigned char*)"he'll"));
+  puts((const char*)trieGet(trie, (unsigned char*)"hell"));
   return 0;
 }
