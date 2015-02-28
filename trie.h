@@ -61,6 +61,6 @@ int trieAdd (Trie *, nByte_t *, void *);
 void* trieGet (Trie *, nByte_t* key);
 Trie* trieElemInit (void);
 TrieElem* trieFind (Trie *, nByte_t *, int);
-int trieDelete (Trie *, nByte_t *, void (*destroy)(nWord_t));
+int trieDelete (Trie *, nByte_t *, void (*trieValDestroy)(nWord_t));
 
 #endif

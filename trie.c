@@ -81,7 +81,7 @@ Trie* trieInit (void) {
 }
 
 TrieElem* trieFind (Trie* t, nByte_t* key, int alloc) {
-  unsigned i, l, c, m, n, s;
+  int i, l, c, m, n, s;
   l = trieStrlen(key) * trieOff;
   for (i = 0; i < l; i++) {
     trieStep();
@@ -94,9 +94,8 @@ TrieElem* trieFind (Trie* t, nByte_t* key, int alloc) {
   return t;
 }
 
-int trieDelete (Trie* t, nByte_t* key, void (*destroy)(nWord_t)) {
-  unsigned i, l, c, m, n, s, u;
-  int z;
+int trieDelete (Trie* t, nByte_t* key, void (*trieValDestroy)(nWord_t)) {
+  unsigned i, l, c, m, n, s, u, z;
   nWord_t* stack;
   TrieElem* del;
   z = 0, l = trieStrlen(key) * trieOff;
@@ -111,7 +110,7 @@ int trieDelete (Trie* t, nByte_t* key, void (*destroy)(nWord_t)) {
   u = 0;
   del = (TrieElem *)stack[z--];
   if (del->sub[trieVal]) {
-    destroy(del->sub[trieVal]);
+    trieValDestroy(del->sub[trieVal]);
   }
   for (i = 0; i < trieVal; i++) {
     if (del->sub[i]) { u += 1; }
