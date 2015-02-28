@@ -44,10 +44,5 @@ int main (void)
   getchar();
   puts((const char*)trieGet(trie, (unsigned char*)"hello"));
   trieDelete(trie, (unsigned char *)"hello", &destroy);
-  puts((const char*)trieGet(trie, (unsigned char*)"hell"));
-  puts((const char*)trieGet(trie, (unsigned char*)"he'll"));
-  trieDelete(trie, (unsigned char *)"hell", &destroy);
-  puts((const char*)trieGet(trie, (unsigned char*)"he'll"));
-  puts((const char*)trieGet(trie, (unsigned char*)"hell"));
   return 0;
 }
