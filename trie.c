@@ -95,7 +95,7 @@ TrieElem* trieFind (Trie* t, nByte_t* key, int alloc) {
 }
 
 int trieDelete (Trie* t, nByte_t* key, void (*trieValDestroy)(nWord_t)) {
-  unsigned i, l, c, m, n, s, u, z;
+  int i, l, c, m, n, s, u, z;
   nWord_t* stack;
   TrieElem* del;
   z = 0, l = trieStrlen(key) * trieOff;
