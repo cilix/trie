@@ -31,20 +31,13 @@
 #ifndef _TRIE_H
 #define _TRIE_H
 
-#define TRIE_USE_CHAINING
-
 typedef unsigned long int nWord_t;
 typedef unsigned char nByte_t;
 
 /* to change trie span, both variables below must be changed */
-#define TRIE_SPAN  5 /* trie span */
-#define TRIE_LIMIT 32 /* 2 ^ span */
+#define TRIE_SPAN  1 /* trie span */
+#define TRIE_LIMIT 2 /* 2 ^ span */
 
-/* this doesn't need to be changed, but doing so accordingly 
-(with the above variables) can greatly impact performance */
-#define TRIE_KEY_MAX 32
-
-#define TRIE_POOL  64
 #define BYTE_SIZE  8
 
 typedef struct trieElem TrieElem;
@@ -64,10 +57,10 @@ struct trieElem {
 int trieStrlen (nByte_t *);
 void* trieMalloc (nWord_t);
 Trie* trieInit (void);
-int trieAdd (Trie *, nByte_t *, void *);
-void* trieGet (Trie *, nByte_t* key);
+int trieAdd (Trie *, nByte_t *, int, void *);
+void* trieGet (Trie *, nByte_t* key, int);
 Trie* trieElemInit (void);
-TrieElem* trieFind (Trie *, nByte_t *, int);
-int trieDelete (Trie *, nByte_t *, void (*trieValDestroy)(nWord_t));
+TrieElem* trieFind (Trie *, nByte_t *, int, int);
+int trieDelete (Trie *, nByte_t *, int, void (*trieValDestroy)(nWord_t));
 
 #endif

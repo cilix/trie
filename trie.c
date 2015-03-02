@@ -34,11 +34,7 @@
 
 #include "trie.h"
 
-#ifndef TRIE_USE_CHAINING
 const int trieVal = TRIE_LIMIT;
-#else
-const int trieVal = 2;
-#endif
 const int trieDiff = BYTE_SIZE - TRIE_SPAN;
 const int trieMask = 0xff >> trieDiff;
 const int trieOff = BYTE_SIZE / TRIE_SPAN;
@@ -48,13 +44,6 @@ const int trieOff = BYTE_SIZE / TRIE_SPAN;
   s = (trieDiff - (m * TRIE_SPAN)); \
   c = (key[n] & (trieMask << s)) >> s; \
 } while (0)
-
-int trieStrlen (nByte_t* str) {
-  unsigned int len, nlen;
-  len = (unsigned int)strlen((const char *)str);
-  nlen = (len > TRIE_KEY_MAX ? TRIE_KEY_MAX : len);
-  return (int)nlen;
-}
 
 void* trieMalloc (size_t size) {
   void* buf = malloc(size);
@@ -68,15 +57,7 @@ void* trieMalloc (size_t size) {
 }
 
 Trie* trieElemInit (void) {
-  static int tcnt = TRIE_POOL;
-  static Trie* pool = NULL;
-  Trie* t;
-  if (tcnt == TRIE_POOL) {
-    pool = NULL;
-    pool = trieMalloc(sizeof(Trie) * TRIE_POOL);
-    tcnt = 0;
-  }
-  t = &pool[tcnt++];
+  Trie* t = trieMalloc(sizeof(Trie));
   return t;
 }
 
@@ -84,87 +65,48 @@ Trie* trieInit (void) {
   return trieElemInit();
 }
 
-TrieElem* trieFind (Trie* t, nByte_t* key, int alloc) {
-  int i, l, c, m, n, s;
-  l = trieStrlen(key) * trieOff;
+TrieElem* trieFind (Trie* t, nByte_t* key, int len, int alloc) {
+  int i, l, m, n, s;
+  unsigned c;
+  l = len * trieOff;
   for (i = 0; i < l; i++) {
     trieStep();
-#ifndef TRIE_USE_CHAINING
     if (!t->sub[c]) {
       if (!alloc) { return NULL; }
       t->sub[c] = (nWord_t)trieElemInit();
     }
     t = (TrieElem *)t->sub[c];
-#else
-    if (!t->sub[0]) {
-      if (!alloc) { return NULL; }
-      t->sub[0] = (nWord_t)trieElemInit();
-      t = (TrieElem *)t->sub[0];
-      t->c = c;
-      continue;
-    }
-    t = (TrieElem *)t->sub[0];
-    while (t->sub[1]) {
-      if (t->c == c) { break; }
-      t = (TrieElem *)t->sub[1];
-    }
-    if (t->c != c) {
-      if (!alloc) { return NULL; }
-      t->sub[1] = (nWord_t)trieElemInit();
-      t = (TrieElem *)t->sub[1];
-      t->c = c;
-    }
-#endif
   }
   return t;
 }
 
-int trieDelete (Trie* t, nByte_t* key, void (*trieValDestroy)(nWord_t)) {
-  int i, l, c, m, n, s, u, z;
+int trieDelete (Trie* t, nByte_t* key, int len, void (*destroy)(nWord_t)) {
+  int i, l, m, n, s, u, z;
+  unsigned c;
   nWord_t* stack;
   TrieElem *d, *h;
-  z = 0, l = trieStrlen(key) * trieOff;
+  z = 0, l = len * trieOff;
   stack = trieMalloc(l);
   for (i = 0; i < l; i++) {
     trieStep();
-#ifndef TRIE_USE_CHAINING
     if (!t->sub[c]) { return 0; }
     stack[z++] = (nWord_t)t;
     t = (TrieElem *)t->sub[c];
-#else
-    if (!t->sub[0]) {
-      return 0;
-    }
-    stack[z++] = (nWord_t)t;
-    t = (TrieElem *)t->sub[0];
-    while (t->sub[1]) {
-      if (t->c == c) { break; }
-      t = (TrieElem *)t->sub[1];
-    }
-    if (t->c != c) {
-      return 0;
-    }
-#endif
   }
   stack[z] = (nWord_t)t;
   u = 0;
   d = (TrieElem *)stack[z--];
   if (d->sub[trieVal]) {
-    trieValDestroy(d->sub[trieVal]);
+    destroy(d->sub[trieVal]);
     d->sub[trieVal] = 0;
   }
-#ifndef TRIE_USE_CHAINING
   for (i = 0; i < trieVal; i++) {
     if (d->sub[i]) { u += 1; }
   }
-#else
-  if (d->sub[0]) { u = 1; }
-#endif
-  if (!u) { free((void *)d); }
+  if (!u) { free(d); }
   while (z >= 0) {
     u = 0;
     d = (TrieElem *)stack[z--];
-#ifndef TRIE_USE_CHAINING
     for (i = 0; i <= trieVal; i++) {
       if (d->sub[i] == stack[z+1]) {
         d->sub[i] = 0;
@@ -172,30 +114,20 @@ int trieDelete (Trie* t, nByte_t* key, void (*trieValDestroy)(nWord_t)) {
         u += 1;
       }
     }
-#else
-    h = (TrieElem *)d->sub[0];
-    while (h->sub[1]) {
-      if ((nWord_t)h != stack[z+1]) {
-        u = 1;
-        break;
-      }
-      h = (TrieElem *)h->sub[1];
-    }
-#endif
     if (!u) { free((void *)d); }
   }
   return 1;
 }
 
-int trieAdd (Trie* t, nByte_t* key, void* val) {
-  t = trieFind(t, key, 1);
+int trieAdd (Trie* t, nByte_t* key, int len, void* val) {
+  t = trieFind(t, key, len, 1);
   if (!t) { return 0; }
   t->sub[trieVal] = (nWord_t)val;
   return 1;
 }
 
-void* trieGet (Trie* t, nByte_t* key) {
-  t = trieFind(t, key, 0);
+void* trieGet (Trie* t, nByte_t* key, int len) {
+  t = trieFind(t, key, len, 0);
   if (!t) { return NULL; }
   return (void *)t->sub[trieVal];
 }
