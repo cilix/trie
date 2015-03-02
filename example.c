@@ -18,7 +18,6 @@ void teststr(nByte_t * str)
 
 void destroy (nWord_t val) {
   /* custom destroy function here for node values */
-  puts((const char *)val);
 }
 
 int main (void)
@@ -29,14 +28,12 @@ int main (void)
   nByte_t str[32];
   srand(time(NULL));
   start = (float)clock()/CLOCKS_PER_SEC;
-  for( i=0; i<500000; ++i ){
+  for( i=0; i<5000; ++i ){
     teststr(str);
     trieAdd(trie, (unsigned char*)str, KEY_LENGTH, "val");
   }
   trieAdd(trie, (unsigned char*)"hello", 5, "world");
-  trieAdd(trie, (unsigned char*)"hell", 4, "is a wonderful place");
-  trieAdd(trie, (unsigned char*)"he'll", 5, "never marry you");
-  for( i=0; i<500000; ++i ){
+  for( i=0; i<5000; ++i ){
     teststr(str);
     trieAdd(trie, (unsigned char*)str, KEY_LENGTH, "val");
   }
@@ -46,5 +43,6 @@ int main (void)
   getchar();
 
   puts((const char*)trieGet(trie, (unsigned char*)"hello", 5));
+  trieDelete(trie, (unsigned char *)"hello", 5, &destroy);
   return 0;
 }

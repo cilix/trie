@@ -100,7 +100,7 @@ int trieDelete (Trie* t, nByte_t* key, int len, void (*destroy)(nWord_t)) {
     destroy(d->sub[trieVal]);
     d->sub[trieVal] = 0;
   }
-  for (i = 0; i < trieVal; i++) {
+  for (i = 0; i <= trieVal; i++) {
     if (d->sub[i]) { u += 1; }
   }
   if (!u) { free(d); }

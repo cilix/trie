@@ -35,8 +35,8 @@ typedef unsigned long int nWord_t;
 typedef unsigned char nByte_t;
 
 /* to change trie span, both variables below must be changed */
-#define TRIE_SPAN  1 /* trie span */
-#define TRIE_LIMIT 2 /* 2 ^ span */
+#define TRIE_SPAN  3 /* trie span */
+#define TRIE_LIMIT 8 /* 2 ^ span */
 
 #define BYTE_SIZE  8
 
