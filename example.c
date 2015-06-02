@@ -5,7 +5,7 @@
 
 #include "trie.h"
 
-#define KEY_LENGTH 9
+#define KEY_LENGTH 15
 
 void teststr(nByte_t * str)
 {
@@ -28,12 +28,12 @@ int main (void)
   nByte_t str[32];
   srand(time(NULL));
   start = (float)clock()/CLOCKS_PER_SEC;
-  for( i=0; i<5000; ++i ){
+  for( i=0; i<500000; ++i ){
     teststr(str);
     trieAdd(trie, (unsigned char*)str, KEY_LENGTH, "val");
   }
   trieAdd(trie, (unsigned char*)"hello", 5, "world");
-  for( i=0; i<5000; ++i ){
+  for( i=0; i<500000; ++i ){
     teststr(str);
     trieAdd(trie, (unsigned char*)str, KEY_LENGTH, "val");
   }
